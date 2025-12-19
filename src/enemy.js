@@ -1,19 +1,21 @@
-class Bullet extends Phaser.Physics.Arcade.Image {
+class Enemy extends Phaser.Physics.Arcade.Image {
 
 
     constructor(scene, x, y,) {
-        super(scene, x, y, 'bullet');
+        super(scene, x, y, 'enemy');
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.scene = scene;
-        this.power = 1;
-        this.shootspeed = 300;
+        this.health = 1;
+        this.attack = 1;
+        this.speed = 5;
+
     }
 
     preload ()
     {
-    this.bullet = this.add.image(200, 200, 'bullet');
+
 
     }
 
@@ -29,4 +31,4 @@ class Bullet extends Phaser.Physics.Arcade.Image {
 }
 
 
-export default Bullet
+export default Enemy

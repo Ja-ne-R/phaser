@@ -1,5 +1,6 @@
-
+import Bullet from "/src/bullet.js"
 import Hero from "/src/hero.js"
+import Enemy from "/src/enemy.js"
 const config = {
     type: Phaser.AUTO,
     width: 1280,
@@ -9,7 +10,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false,
+            debug: true,
             gravity: { y: 0 }
         }
     },
@@ -35,8 +36,9 @@ var playerX = 200;
 var playerY = 200;
 const game = new Phaser.Game(config);
 var dir;
-var starDir;
-
+var yes = true;
+var enemySpeed = false;
+var vector;
 function preload() {
 this.WKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 this.SKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -45,8 +47,9 @@ this.AKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 this.SpaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
   this.load.image('tiles', 'assets/tileset.png');
-        this.load.image('hero', 'assets/lilhero.png');
-  this.load.image('star', "assets/star.png");
+  this.load.image('hero', 'assets/lilhero.png');
+  this.load.image('bullet', 'assets/star.png');
+  this.load.image('enemy', 'assets/skull.png');
   
   // Runs once, loads up assets like images and audio
   //   this.load.image('tiles', 'assets/spritesheet.png');
@@ -57,11 +60,16 @@ this.SpaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
 var cooldown = false;
 var starX;
 var starY;
+
+
+var eSpawnX = Phaser.Math.Between(-200, 1600);
+var eSpawnY = Phaser.Math.Between(-300, 0);
 function create() {
 
 
+
   const array =[   
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
    [1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1],
    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -98,22 +106,28 @@ function create() {
   // this.map = JSON.parse(this.game.cache.getText('map'));
 
 this.hero = this.physics.add.existing(new Hero(this, 100, 100));
-
+this.hero.setDepth(8);
+this.hero.setCollideWorldBounds(true, 1, 1);
 //bullets
-
+for (var i = 0; i < 10; i++)
+{
+    let enemy = new Enemy(this, this.eSpawnX, this.eSpawnY, 'enemy');
+    this.physics.add.existing(enemy);
+}
 this.input.on('pointerdown', pointer => {
-          let shootspeed = 300;
+var curX = this.hero.x;
+var curY = this.hero.y;
+
           
           // create bullet
-this.star = this.physics.add.sprite(this.hero.x, this.hero.y, 'star')
-          this.physics.add.existing(this.star);
+this.bullet = this.physics.add.existing(new Bullet(this, curX, curY));
           
           // get Vector where to shoot bullet
           let vector = new Phaser.Math.Vector2( pointer.x - this.hero.x, pointer.y - this.hero.y );
            
           // set Speed of bullet 
-          vector.setLength(shootspeed);
-          
+          vector.setLength(this.bullet.shootspeed);
+
           // DEMO: to shoot in a straightline, just comment the following line in
 
           
@@ -123,24 +137,43 @@ this.star = this.physics.add.sprite(this.hero.x, this.hero.y, 'star')
           // add bullet to group
 
           
-          this.star.body.setVelocity(vector.x, vector.y);
+          this.bullet.body.setVelocity(vector.x, vector.y);
+
       });
+
+//test
+
+
+
+this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
+
+function increaseSpeed(){
+if (yes == true && enemySpeed <= 500){
+
+setTimeout(() => {
+enemySpeed += 20;
+console.log("speed increased" + enemySpeed);
+increaseSpeed()
+}, 3000);
+}
 
 
 }
-
+increaseSpeed();
+}
 
 // move speed and movement controls
 var speed = 8;
 function update(time, delta) {
   // Runs once per frame for the duration of the scene
 
-        
+
 // movement
 if (this.DKey.isDown && this.SKey.isDown){
   this.hero.x += speed; 
   this.hero.y += speed; 
   dir = "x+y+";
+  console.log(this.enemy.x);
 }
 else if (this.AKey.isDown && this.SKey.isDown){
   this.hero.x -= speed;
@@ -176,30 +209,58 @@ else if (this.SKey.isDown){
 
 
 if (this.SpaceKey.isDown && !cooldown){
-var cir = this.add.circle(this.hero.x, this.hero.y, 50, 0x9966ff);
-console.log(dir);
+
+
+var cir = this.add.circle(this.hero.x, this.hero.y, 10, 0x5F2F49);
+
 cooldown = true;
-starDir = dir;
+
         this.tweens.add({
 
             targets: cir,
-            scaleX: 0.20,
-            scaleY: 0.20,
+            scaleX: 7,
+            scaleY: 7,
             yoyo: true,
             repeat: 1,
-            ease: 'Sine.easeInOut'
+            ease: 'Sine.easeIn'
 
         });
 setTimeout(() => {
   cooldown = false;
   cir.destroy();
-}, 3000);
+
+}, 1000);
 }
 
-//bullets
+//enemy
+  const tx = this.hero.x;
+  const ty = this.hero.y;
+
+  const ex = this.enemy.x;
+  const ey = this.enemy.y;
+
+  this.physics.moveToObject(this.enemy, this.hero, enemySpeed);
+
+  
+  const rotation = Phaser.Math.Angle.Between(ex, ey, tx, ty)
+
+// if (yes == true){
+// yes = false;
+
+//   setTimeout(() => {
+//   console.log("Delayed for 1 second.");
+// this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
+//   this.physics.moveToObject(this.enemy, this.hero, enemySpeed);
+
+// }, 5000);
+// }
+
 
 
 }
+
+
+
 
 new Phaser.Game(config);
             
