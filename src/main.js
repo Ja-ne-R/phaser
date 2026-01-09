@@ -21,7 +21,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false,
+            debug: true,
             gravity: { y: 0 }
         }
     },
@@ -31,7 +31,7 @@ const config = {
     update: update
   }
 };
-var star;
+var enemies;
 var playerX = 200;
 var playerY = 200;
 const game = new Phaser.Game(config);
@@ -50,7 +50,8 @@ this.SpaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
   this.load.image('hero', 'assets/lilhero.png');
   this.load.image('bullet', 'assets/star.png');
   this.load.image('enemy', 'assets/skull.png');
-  
+  this.load.tilemapTiledJSON('map', 'assets/map.json');
+
   // Runs once, loads up assets like images and audio
   //   this.load.image('tiles', 'assets/spritesheet.png');
   // this.load.text('map', 'assets/map.json');
@@ -62,58 +63,71 @@ var starX;
 var starY;
 
 
-var eSpawnX = Phaser.Math.Between(-200, 1600);
-var eSpawnY = Phaser.Math.Between(-300, 0);
+
 function create() {
+var map = this.make.tilemap({ key: 'map'});
+var tiles = map.addTilesetImage('tileset', 'tiles');
+var layer = map.createLayer("Ground", tiles, 0, 0);
+var treeLayer = map.createLayer('Trees', tiles, 0, 0);
 
 
 
-  const array =[   
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 43, 1, 1, 12, 13, 14, 1, 1, 43, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 43, 1, 1, 24, 25, 26, 1, 1, 1, 2, 1, 2, 2, 43, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 36, 37, 38, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1],
-   [1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 12, 13, 13, 13, 13, 13, 13, 13, 14, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 43, 1, 1, 1, 24, 25, 25, 25, 25, 25, 25, 25, 26, 1, 1, 1, 1, 1],
-   [1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 24, 25, 25, 25, 25, 25, 25, 25, 26, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 24, 25, 25, 25, 25, 25, 25, 25, 26, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 43, 1, 1, 1, 1, 1, 1, 1, 1, 1, 24, 25, 25, 25, 25, 25, 25, 25, 26, 2, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 36, 37, 37, 37, 37, 37, 37, 37, 38, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-   [1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-  const map = this.make.tilemap({ data:array, tileWidth: 32, tileHeight: 32})
-  map.addTilesetImage("tiles");
-  const layer = map.createLayer(0, "tiles", 0, 0);
-
-
-
-  // Runs once, after all assets in preload are loaded
-  // const map = this.make.tilemap({   key: "map"})
-  // const tileset = map.addTilesetImage("map", "tiles");
-  // const layer = map.createLayer(0, tileset, 0, 0);
-  // this.map = JSON.parse(this.game.cache.getText('map'));
 
 this.hero = this.physics.add.existing(new Hero(this, 100, 100));
-this.hero.setDepth(8);
-this.hero.setCollideWorldBounds(true, 1, 1);
-//bullets
-for (var i = 0; i < 10; i++)
-{
-    let enemy = new Enemy(this, this.eSpawnX, this.eSpawnY, 'enemy');
-    this.physics.add.existing(enemy);
-}
+this.cameras.main.startFollow(this.hero, true, 0.08, 0.08);
+
+// treeLayer.forEachTile(function(tile) { if(tile.canCollide) { collisionGroup.push(tile); } });
+
+let objectLayer = map.getObjectLayer( 'Collisions' );
+
+    for( let obj of objectLayer.objects ){
+        
+        // since you are not displaying the object the shape doesn't matter, only the collision body
+        let gameObject = this.add.rectangle( obj.x, obj.y, obj.width, obj.height )
+                .setOrigin(0);
+        
+        this.physics.add.existing( gameObject, true );
+        
+        if(obj.ellipse){
+           // For the ellipse version you would need to change the body
+            gameObject.body.setCircle( obj.width / 2 );
+        } else if(obj.point){
+            // For the point we need no set an width and height
+            gameObject.body.setSize( 4, 4 );
+        }
+        
+        this.physics.add.collider( this.hero, gameObject );
+    }
+
+
+
+
+
+//enemies
+
+
+    // this.enemies = this.physics.add.group({
+    //     classType: Enemy,
+    //     maxSize: 10
+    // });
+
+    // for (var i = 0; i < 10; i++) {
+    //     var eSpawnX = Phaser.Math.Between(200, 600);
+    //     var eSpawnY = Phaser.Math.Between(200, 600);
+        
+    //     const enemy = this.enemies.get(eSpawnX, eSpawnY);
+
+    //     if (enemy) {
+    //         enemy.setActive(true);
+    //         enemy.setVisible(true);
+
+    //         // You can also set an initial velocity if needed
+    //     }
+    // }
+
+
+// console.log(this.enemies.getChildren());
+// this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
 this.input.on('pointerdown', pointer => {
 var curX = this.hero.x;
 var curY = this.hero.y;
@@ -145,7 +159,7 @@ this.bullet = this.physics.add.existing(new Bullet(this, curX, curY));
 
 
 
-this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
+
 
 function increaseSpeed(){
 if (yes == true && enemySpeed <= 500){
@@ -159,53 +173,96 @@ increaseSpeed()
 
 
 }
+
 increaseSpeed();
 }
 
 // move speed and movement controls
 var speed = 8;
+
+
+
 function update(time, delta) {
+const heroX = this.hero.x;
+    const heroY = this.hero.y;
+
+    // this.enemies.getChildren().forEach(enemy => {
+    //     if (enemy.active) { // Check if the enemy is active
+    //         const enemyX = enemy.x;
+    //         const enemyY = enemy.y;
+    //         const directionX = heroX - enemyX;
+    //         const directionY = heroY - enemyY;
+    //         const distance = Math.sqrt(directionX * directionX + directionY * directionY);
+
+    //         if (distance > 0) {
+    //             const speed = enemySpeed || 100;
+    //             enemy.setVelocity(
+    //                 (directionX / distance) * speed,
+    //                 (directionY / distance) * speed
+    //             );
+    //         } else {
+    //             enemy.setVelocity(0, 0);
+    //         }
+    //     }
+    // });
   // Runs once per frame for the duration of the scene
 
 
 // movement
-if (this.DKey.isDown && this.SKey.isDown){
-  this.hero.x += speed; 
-  this.hero.y += speed; 
-  dir = "x+y+";
-  console.log(this.enemy.x);
-}
-else if (this.AKey.isDown && this.SKey.isDown){
-  this.hero.x -= speed;
-  this.hero.y += speed;
-  dir = "x-y+";
-}
-else if (this.WKey.isDown && this.AKey.isDown){
-  this.hero.x -= speed;
-  this.hero.y -= speed;
-  dir = "x-y-";
-}
-else if (this.WKey.isDown && this.DKey.isDown){
-  this.hero.x += speed;
-  this.hero.y -= speed;
-  dir = "x+y-";
-}
-else if (this.DKey.isDown){
-  this.hero.x += speed;
-  dir = "x+";
-}
-else if (this.AKey.isDown){
-  this.hero.x -= speed;
-  dir = "x-";
-}
-else if (this.WKey.isDown){
-  this.hero.y -= speed;
-  dir = "y-";
-}
-else if (this.SKey.isDown){
-  this.hero.y += speed;
-  dir = "y+";
-}
+ const speed = 200; // Adjusted speed for smoother moves
+    if (this.DKey.isDown) {
+        this.hero.setVelocityX(speed);
+    } else if (this.AKey.isDown) {
+        this.hero.setVelocityX(-speed);
+    } else {
+        this.hero.setVelocityX(0); // Stops movement if no key is pressed
+    }
+
+    if (this.WKey.isDown) {
+        this.hero.setVelocityY(-speed);
+    } else if (this.SKey.isDown) {
+        this.hero.setVelocityY(speed);
+    } else {
+        this.hero.setVelocityY(0); // Stops movement
+    }
+
+// if (this.DKey.isDown && this.SKey.isDown){
+//   this.hero.x += speed; 
+//   this.hero.y += speed; 
+//   dir = "x+y+";
+//   console.log(this.enemy.x);
+// }
+// else if (this.AKey.isDown && this.SKey.isDown){
+//   this.hero.x -= speed;
+//   this.hero.y += speed;
+//   dir = "x-y+";
+// }
+// else if (this.WKey.isDown && this.AKey.isDown){
+//   this.hero.x -= speed;
+//   this.hero.y -= speed;
+//   dir = "x-y-";
+// }
+// else if (this.WKey.isDown && this.DKey.isDown){
+//   this.hero.x += speed;
+//   this.hero.y -= speed;
+//   dir = "x+y-";
+// }
+// else if (this.DKey.isDown){
+//   this.hero.x += speed;
+//   dir = "x+";
+// }
+// else if (this.AKey.isDown){
+//   this.hero.x -= speed;
+//   dir = "x-";
+// }
+// else if (this.WKey.isDown){
+//   this.hero.y -= speed;
+//   dir = "y-";
+// }
+// else if (this.SKey.isDown){
+//   this.hero.y += speed;
+//   dir = "y+";
+// }
 
 
 if (this.SpaceKey.isDown && !cooldown){
@@ -233,16 +290,16 @@ setTimeout(() => {
 }
 
 //enemy
-  const tx = this.hero.x;
-  const ty = this.hero.y;
+//   const tx = this.hero.x;
+//   const ty = this.hero.y;
 
-  const ex = this.enemy.x;
-  const ey = this.enemy.y;
+//   const ex = this.enemy.x;
+//   const ey = this.enemy.y;
 
-  this.physics.moveToObject(this.enemy, this.hero, enemySpeed);
+//   this.physics.moveToObject(this.enemy, this.hero, enemySpeed);
 
   
-  const rotation = Phaser.Math.Angle.Between(ex, ey, tx, ty)
+//   const rotation = Phaser.Math.Angle.Between(ex, ey, tx, ty)
 
 // if (yes == true){
 // yes = false;
