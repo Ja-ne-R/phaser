@@ -51,41 +51,32 @@ this.SpaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
   this.load.image('bullet', 'assets/star.png');
   this.load.image('enemy', 'assets/skull.png');
   this.load.tilemapTiledJSON('map', 'assets/map.json');
-
-  // Runs once, loads up assets like images and audio
-  //   this.load.image('tiles', 'assets/spritesheet.png');
-  // this.load.text('map', 'assets/map.json');
-
-
+  this.load.image('wand', 'assets/wand.png');
 }
 var cooldown = false;
-var starX;
-var starY;
-
-
 
 function create() {
 var map = this.make.tilemap({ key: 'map'});
 var tiles = map.addTilesetImage('tileset', 'tiles');
 var layer = map.createLayer("Ground", tiles, 0, 0);
+var fillerLayer = map.createLayer('Filler', tiles, 0, 0);
 var treeLayer = map.createLayer('Trees', tiles, 0, 0);
-
-
-
+var stuffLayer = map.createLayer('Stuff', tiles, 0, 0);
 
 this.hero = this.physics.add.existing(new Hero(this, 100, 100));
+this.wand = this.add.image(this.hero.x, this.hero.y, 'wand');
 this.cameras.main.startFollow(this.hero, true, 0.08, 0.08);
 
 // treeLayer.forEachTile(function(tile) { if(tile.canCollide) { collisionGroup.push(tile); } });
-
+let collisionGroup = this.physics.add.staticGroup();
 let objectLayer = map.getObjectLayer( 'Collisions' );
 
     for( let obj of objectLayer.objects ){
         
         // since you are not displaying the object the shape doesn't matter, only the collision body
-        let gameObject = this.add.rectangle( obj.x, obj.y, obj.width, obj.height )
-                .setOrigin(0);
-        
+   let gameObject = this.add.rectangle(obj.x, obj.y, obj.width, obj.height)
+    .setOrigin(0);
+collisionGroup.add(gameObject);
         this.physics.add.existing( gameObject, true );
         
         if(obj.ellipse){
@@ -99,7 +90,10 @@ let objectLayer = map.getObjectLayer( 'Collisions' );
         this.physics.add.collider( this.hero, gameObject );
     }
 
-
+this.bullets = this.physics.add.group({
+    classType: Bullet,
+    runsChildUpdate: true
+});
 
 
 
@@ -129,31 +123,22 @@ let objectLayer = map.getObjectLayer( 'Collisions' );
 // console.log(this.enemies.getChildren());
 // this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
 this.input.on('pointerdown', pointer => {
-var curX = this.hero.x;
-var curY = this.hero.y;
-
-          
-          // create bullet
-this.bullet = this.physics.add.existing(new Bullet(this, curX, curY));
-          
-          // get Vector where to shoot bullet
-          let vector = new Phaser.Math.Vector2( pointer.x - this.hero.x, pointer.y - this.hero.y );
-           
-          // set Speed of bullet 
-          vector.setLength(this.bullet.shootspeed);
-
-          // DEMO: to shoot in a straightline, just comment the following line in
-
-          
-          // DEMO: QuickFix to destroy the bullet after 1 Second automatically
-          // setTimeout( () => bullet.destroy(), 1000);
-          
-          // add bullet to group
-
-          
-          this.bullet.body.setVelocity(vector.x, vector.y);
-
+    let bullet = this.bullets.get(this.hero.x, this.hero.y);
+    if (bullet) {
+        bullet.setActive(true);
+        bullet.setVisible(true);
+        
+        // Get Vector where to shoot bullet
+        let vector = new Phaser.Math.Vector2(pointer.x - this.hero.x, pointer.y - this.hero.y);
+        vector.setLength(bullet.shootspeed);
+        
+        bullet.body.setVelocity(vector.x, vector.y);
+    }
       });
+this.physics.add.collider(this.bullets, collisionGroup, (bullet, collisionObject) => {
+    bullet.destroy(); // Remove bullet on collision
+
+});
 
 //test
 
@@ -212,18 +197,23 @@ const heroX = this.hero.x;
  const speed = 200; // Adjusted speed for smoother moves
     if (this.DKey.isDown) {
         this.hero.setVelocityX(speed);
+        this.wand.setX(this.hero.x);
     } else if (this.AKey.isDown) {
         this.hero.setVelocityX(-speed);
+        this.wand.setX(this.hero.x);
     } else {
         this.hero.setVelocityX(0); // Stops movement if no key is pressed
     }
 
     if (this.WKey.isDown) {
         this.hero.setVelocityY(-speed);
+        this.wand.setY(this.hero.y);
     } else if (this.SKey.isDown) {
         this.hero.setVelocityY(speed);
+        this.wand.setY(this.hero.y);
     } else {
         this.hero.setVelocityY(0); // Stops movement
+
     }
 
 // if (this.DKey.isDown && this.SKey.isDown){

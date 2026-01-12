@@ -9,11 +9,12 @@ class Bullet extends Phaser.Physics.Arcade.Image {
         this.scene = scene;
         this.power = 1;
         this.shootspeed = 300;
+        this.setCollideWorldBounds(true);
     }
 
     preload ()
     {
-    this.bullet = this.add.image(200, 200, 'bullet');
+
 
     }
 
