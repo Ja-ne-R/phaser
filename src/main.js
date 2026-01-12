@@ -45,7 +45,7 @@ this.SKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
 this.DKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 this.AKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 this.SpaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
+  this.load.audio('shoot', 'assets/shoot-wav');
   this.load.image('tiles', 'assets/tileset.png');
   this.load.image('hero', 'assets/lilhero.png');
   this.load.image('bullet', 'assets/star.png');
@@ -56,6 +56,7 @@ this.SpaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
 var cooldown = false;
 
 function create() {
+var shoot = this.sound.add('shoot');
 var map = this.make.tilemap({ key: 'map'});
 var tiles = map.addTilesetImage('tileset', 'tiles');
 var layer = map.createLayer("Ground", tiles, 0, 0);
@@ -123,6 +124,7 @@ this.bullets = this.physics.add.group({
 // console.log(this.enemies.getChildren());
 // this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
 this.input.on('pointerdown', pointer => {
+    shoot.play();
     let bullet = this.bullets.get(this.hero.x, this.hero.y);
     if (bullet) {
         bullet.setActive(true);
