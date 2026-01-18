@@ -1,5 +1,7 @@
 import Bullet from "/src/bullet.js"
 import Hero from "/src/hero.js"
+
+
 import Enemy from "/src/enemy.js"
 const config = {
     type: Phaser.AUTO,
@@ -18,13 +20,6 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    physics: {
-        default: 'arcade',
-        arcade: {
-            debug: true,
-            gravity: { y: 0 }
-        }
-    },
   scene: {
     preload: preload,
     create: create,
@@ -39,6 +34,7 @@ var dir;
 var yes = true;
 var enemySpeed = false;
 var vector;
+
 function preload() {
 this.WKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 this.SKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -56,17 +52,17 @@ this.SpaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
 var cooldown = false;
 
 function create() {
-var shoot = this.sound.add('shoot');
+this.camera = this.cameras.main;
 var map = this.make.tilemap({ key: 'map'});
 var tiles = map.addTilesetImage('tileset', 'tiles');
 var layer = map.createLayer("Ground", tiles, 0, 0);
 var fillerLayer = map.createLayer('Filler', tiles, 0, 0);
 var treeLayer = map.createLayer('Trees', tiles, 0, 0);
 var stuffLayer = map.createLayer('Stuff', tiles, 0, 0);
-
+var castleEntranceLayer = map.getObjectLayer('Castle_entrance');
 this.hero = this.physics.add.existing(new Hero(this, 100, 100));
 this.wand = this.add.image(this.hero.x, this.hero.y, 'wand');
-this.cameras.main.startFollow(this.hero, true, 0.08, 0.08);
+this.cameras.main.startFollow(this.hero, true, 1, 1);
 
 // treeLayer.forEachTile(function(tile) { if(tile.canCollide) { collisionGroup.push(tile); } });
 let collisionGroup = this.physics.add.staticGroup();
@@ -89,6 +85,28 @@ collisionGroup.add(gameObject);
         }
         
         this.physics.add.collider( this.hero, gameObject );
+    }
+
+for( let obj of castleEntranceLayer.objects ){
+        
+        // since you are not displaying the object the shape doesn't matter, only the collision body
+   let gameObject = this.add.rectangle(obj.x, obj.y, obj.width, obj.height)
+    .setOrigin(0);
+collisionGroup.add(gameObject);
+        this.physics.add.existing( gameObject, true );
+        
+        if(obj.ellipse){
+           // For the ellipse version you would need to change the body
+            gameObject.body.setCircle( obj.width / 2 );
+        } else if(obj.point){
+            // For the point we need no set an width and height
+            gameObject.body.setSize( 4, 4 );
+        }
+        
+        this.physics.add.overlap(this.hero, gameObject, (hero, collisionObject) => {
+    console.log("hello");
+    this.scene.start('Castle');
+});
     }
 
 this.bullets = this.physics.add.group({
@@ -124,22 +142,28 @@ this.bullets = this.physics.add.group({
 // console.log(this.enemies.getChildren());
 // this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
 this.input.on('pointerdown', pointer => {
-    shoot.play();
-    let bullet = this.bullets.get(this.hero.x, this.hero.y);
+    const activePointer = this.input.activePointer;
+    const lockedToCamPointer = activePointer.positionToCamera(this.cameras.main);
+    const bullet = this.bullets.get(this.hero.x, this.hero.y);
+    
     if (bullet) {
         bullet.setActive(true);
         bullet.setVisible(true);
         
-        // Get Vector where to shoot bullet
-        let vector = new Phaser.Math.Vector2(pointer.x - this.hero.x, pointer.y - this.hero.y);
+        // Calculate shooting vector and set bullet speed
+        let vector = new Phaser.Math.Vector2(lockedToCamPointer.x - this.hero.x, lockedToCamPointer.y - this.hero.y);
         vector.setLength(bullet.shootspeed);
         
         bullet.body.setVelocity(vector.x, vector.y);
+        
+        // Optional: Set rotation if needed
+        bullet.rotation = Phaser.Math.Angle.Between(this.hero.x, this.hero.y, lockedToCamPointer.x, lockedToCamPointer.y);
     }
-      });
-this.physics.add.collider(this.bullets, collisionGroup, (bullet, collisionObject) => {
-    bullet.destroy(); // Remove bullet on collision
+});
 
+this.physics.add.collider(this.bullets, collisionGroup, (bullet, collisionObject) => {
+    // Optional: Run effects here before destroying
+    bullet.destroy(); // Remove bullet on collision
 });
 
 //test
@@ -148,20 +172,20 @@ this.physics.add.collider(this.bullets, collisionGroup, (bullet, collisionObject
 
 
 
-function increaseSpeed(){
-if (yes == true && enemySpeed <= 500){
+// function increaseSpeed(){
+// if (yes == true && enemySpeed <= 500){
 
-setTimeout(() => {
-enemySpeed += 20;
-console.log("speed increased" + enemySpeed);
-increaseSpeed()
-}, 3000);
-}
+// setTimeout(() => {
+// enemySpeed += 20;
+// console.log("speed increased" + enemySpeed);
+// increaseSpeed()
+// }, 3000);
+// }
 
 
-}
+// }
 
-increaseSpeed();
+// increaseSpeed();
 }
 
 // move speed and movement controls
@@ -196,65 +220,29 @@ const heroX = this.hero.x;
 
 
 // movement
- const speed = 200; // Adjusted speed for smoother moves
+
     if (this.DKey.isDown) {
-        this.hero.setVelocityX(speed);
+        this.hero.setVelocityX(this.hero.speed);
         this.wand.setX(this.hero.x);
     } else if (this.AKey.isDown) {
-        this.hero.setVelocityX(-speed);
+        this.hero.setVelocityX(-this.hero.speed);
         this.wand.setX(this.hero.x);
     } else {
         this.hero.setVelocityX(0); // Stops movement if no key is pressed
     }
 
     if (this.WKey.isDown) {
-        this.hero.setVelocityY(-speed);
+        this.hero.setVelocityY(-this.hero.speed);
         this.wand.setY(this.hero.y);
     } else if (this.SKey.isDown) {
-        this.hero.setVelocityY(speed);
+        this.hero.setVelocityY(this.hero.speed);
         this.wand.setY(this.hero.y);
     } else {
         this.hero.setVelocityY(0); // Stops movement
 
     }
 
-// if (this.DKey.isDown && this.SKey.isDown){
-//   this.hero.x += speed; 
-//   this.hero.y += speed; 
-//   dir = "x+y+";
-//   console.log(this.enemy.x);
-// }
-// else if (this.AKey.isDown && this.SKey.isDown){
-//   this.hero.x -= speed;
-//   this.hero.y += speed;
-//   dir = "x-y+";
-// }
-// else if (this.WKey.isDown && this.AKey.isDown){
-//   this.hero.x -= speed;
-//   this.hero.y -= speed;
-//   dir = "x-y-";
-// }
-// else if (this.WKey.isDown && this.DKey.isDown){
-//   this.hero.x += speed;
-//   this.hero.y -= speed;
-//   dir = "x+y-";
-// }
-// else if (this.DKey.isDown){
-//   this.hero.x += speed;
-//   dir = "x+";
-// }
-// else if (this.AKey.isDown){
-//   this.hero.x -= speed;
-//   dir = "x-";
-// }
-// else if (this.WKey.isDown){
-//   this.hero.y -= speed;
-//   dir = "y-";
-// }
-// else if (this.SKey.isDown){
-//   this.hero.y += speed;
-//   dir = "y+";
-// }
+
 
 
 if (this.SpaceKey.isDown && !cooldown){

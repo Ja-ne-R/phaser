@@ -8,6 +8,7 @@ class Hero extends Phaser.Physics.Arcade.Image {
         scene.physics.add.existing(this);
         this.scene = scene;
         this.health = 1;
+        this.speed = 200;
 
     }
 

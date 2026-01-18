@@ -1,12 +1,4 @@
 { "compressionlevel":-1,
- "editorsettings":
-    {
-     "export":
-        {
-         "format":"json",
-         "target":"map.tmj"
-        }
-    },
  "height":100,
  "infinite":false,
  "layers":[
@@ -658,7 +650,7 @@
                  "y":1134.75
                 }, 
                 {
-                 "height":48.75,
+                 "height":60.75,
                  "id":24,
                  "name":"",
                  "rotation":0,
@@ -666,7 +658,7 @@
                  "visible":true,
                  "width":96.5,
                  "x":160,
-                 "y":1130.75
+                 "y":1118.75
                 }, 
                 {
                  "height":58.25,
