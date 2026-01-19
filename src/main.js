@@ -1,7 +1,7 @@
 import Bullet from "/src/bullet.js"
 import Hero from "/src/hero.js"
-
-
+import Castle from "/src/castle.js"
+import Controls from "/src/controls.js"
 import Enemy from "/src/enemy.js"
 const config = {
     type: Phaser.AUTO,
@@ -36,6 +36,7 @@ var enemySpeed = false;
 var vector;
 
 function preload() {
+
 this.WKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 this.SKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
 this.DKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -52,6 +53,7 @@ this.SpaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
 var cooldown = false;
 
 function create() {
+game.scene.add('Castle', Castle, false);
 this.camera = this.cameras.main;
 var map = this.make.tilemap({ key: 'map'});
 var tiles = map.addTilesetImage('tileset', 'tiles');
@@ -59,7 +61,7 @@ var layer = map.createLayer("Ground", tiles, 0, 0);
 var fillerLayer = map.createLayer('Filler', tiles, 0, 0);
 var treeLayer = map.createLayer('Trees', tiles, 0, 0);
 var stuffLayer = map.createLayer('Stuff', tiles, 0, 0);
-var castleEntranceLayer = map.getObjectLayer('Castle_entrance');
+var castleEntranceLayer = map.getObjectLayer('CastleEntrance');
 this.hero = this.physics.add.existing(new Hero(this, 100, 100));
 this.wand = this.add.image(this.hero.x, this.hero.y, 'wand');
 this.cameras.main.startFollow(this.hero, true, 1, 1);
@@ -105,7 +107,7 @@ collisionGroup.add(gameObject);
         
         this.physics.add.overlap(this.hero, gameObject, (hero, collisionObject) => {
     console.log("hello");
-    this.scene.start('Castle');
+    this.scene.switch('Castle');
 });
     }
 
