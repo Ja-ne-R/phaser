@@ -348,7 +348,7 @@ setTimeout(() => {
 // }, 5000);
 // }
 if (this.SpaceKey.isDown){
-    console.log(this.chickens.children.entries);
+    console.log(this.chickens.getChildren());
 }
 
     
