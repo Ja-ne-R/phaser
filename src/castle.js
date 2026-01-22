@@ -23,6 +23,9 @@ this.SprintKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT
     }
 
     create() {
+this.dungeon_music = this.sound.add('dungeon_music');
+this.dungeon_music.loop = true;
+this.dungeon_music.play();
         // game.scene.add('Main', Main, false);
 let collisionGroup = this.physics.add.staticGroup();
 var dungeonmap = this.make.tilemap({ key: 'dungeonmap'});
@@ -75,6 +78,7 @@ collisionGroup.add(gameObject);
     this.scene.switch('World');
     this.hero.setX(100);
     this.hero.setY(100);
+    this.dungeon_music.stop();
 });
     }
 

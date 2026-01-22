@@ -39,6 +39,7 @@ var stuffLayer = map.createLayer('Stuff', tiles, 0, 0);
 var castleEntranceLayer = map.getObjectLayer('CastleEntrance');
 this.hero = this.physics.add.existing(new Hero(this, 100, 100));
 this.wand = this.add.image(this.hero.x, this.hero.y, 'wand');
+
 this.cameras.main.startFollow(this.hero, true, 1, 1);
         let helpText = this.add.text(40, 30, 'Scene 1\nUse WASD to move the player')
             .setOrigin(0)
@@ -99,7 +100,8 @@ this.bullets = this.physics.add.group({
     runsChildUpdate: true
 });
 
-
+this.shoot = this.sound.add('shoot');
+this.peck = this.sound.add('peck');
 
 //enemies
 
@@ -127,6 +129,7 @@ this.bullets = this.physics.add.group({
 // console.log(this.enemies.getChildren());
 // this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
 this.input.on('pointerdown', pointer => {
+    this.shoot.play();
     const activePointer = this.input.activePointer;
     const lockedToCamPointer = activePointer.positionToCamera(this.cameras.main);
     const bullet = this.bullets.get(this.hero.x, this.hero.y);
@@ -166,9 +169,71 @@ this.physics.add.collider(this.bullets, collisionGroup, (bullet, collisionObject
 // increaseSpeed()
 // }, 3000);
 // }
+//chickens
+this.chickens = this.physics.add.group({
+    maxSize: 10,
+    collideWorldBounds: true,
+    maxSpeed: 20
+})
+for (var i = 0; i < 10; i++) {
+
+let ranchiX = Phaser.Math.Between(50, 1500);
+let ranchiY = Phaser.Math.Between(50, 1500);
+const chicken = this.physics.add.sprite(ranchiX, ranchiY, 'chicken');
+    chicken.setCollideWorldBounds(true);
+    chicken.setBounce(1); // Optional: makes it bounce off walls
+
+    // Set up the random movement timer
+    this.time.addEvent({
+        delay: 1500, // Change direction every 1.5 seconds
+        loop: true,
+        callback: () => {
+            const speed = 40;
+            const directions = [
+                { x: speed, y: 0, type: 'walk'},
+                { x: -speed, y: 0, type: 'walk' },
+                { x: 0, y: speed, type: 'walk' },
+                { x: 0, y: -speed, type: 'walk' },
+                { x: 0, y: 0, type: 'peck' } // Chance to stop and peck
+
+            ];
+            
+            const move = Phaser.Math.RND.pick(directions);
+            chicken.setVelocity(move.x, move.y);
+            if (move.type === 'peck'){
+                this.peck.play();
+            }
+            // Flip the sprite based on horizontal direction
+            if (move.x > 0) chicken.setFlipX(true);
+            else if (move.x < 0) chicken.setFlipX(false);
+        }
+    });
 
 
-// }
+}
+
+
+
+//     this.chickens.getChildren().forEach(chicken => {
+// this.time.addEvent({
+//     delay: 2000, // Change direction every 2 seconds
+//     callback: () => {
+//         const speed = 100;
+//         const directions = [
+//             { x: speed, y: 0 },  // Right
+//             { x: -speed, y: 0 }, // Left
+//             { x: 0, y: speed },  // Down
+//             { x: 0, y: -speed }  // Up
+//         ];
+//         const randomDir = Phaser.Math.RND.pick(directions);
+//         this.chickens.setVelocity(randomDir.x, randomDir.y);
+//     },
+//     loop: true
+// });
+    // });
+// Inside create()
+
+
 
 // increaseSpeed();
 }
@@ -233,15 +298,15 @@ const heroX = this.hero.x;
         this.hero.speed = 200;
     }
 
-
+var cooldown = false;
 
 
 if (this.SpaceKey.isDown && !cooldown){
-
+cooldown = true;
 
 var cir = this.add.circle(this.hero.x, this.hero.y, 10, 0x5F2F49);
 
-cooldown = true;
+
 
         this.tweens.add({
 
@@ -282,7 +347,14 @@ setTimeout(() => {
 
 // }, 5000);
 // }
+if (this.SpaceKey.isDown){
+    console.log(this.chickens.children.entries);
+}
 
+    
+        
+        
+        
 
 
 }
