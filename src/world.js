@@ -7,6 +7,7 @@ import Enemy from "/src/enemy.js"
 export class World extends Phaser.Scene {
     constructor() {
         super('World');
+        this.pickupChickens = null;
     }
 
 
@@ -27,7 +28,7 @@ var cooldown = false;
 
 create() {
 
-  
+  this.pickupChickens = this.add.group();
 
 this.camera = this.cameras.main;
 var map = this.make.tilemap({ key: 'map'});
@@ -103,31 +104,7 @@ this.bullets = this.physics.add.group({
 this.shoot = this.sound.add('shoot');
 this.peck = this.sound.add('peck');
 
-//enemies
 
-
-    // this.enemies = this.physics.add.group({
-    //     classType: Enemy,
-    //     maxSize: 10
-    // });
-
-    // for (var i = 0; i < 10; i++) {
-    //     var eSpawnX = Phaser.Math.Between(200, 600);
-    //     var eSpawnY = Phaser.Math.Between(200, 600);
-        
-    //     const enemy = this.enemies.get(eSpawnX, eSpawnY);
-
-    //     if (enemy) {
-    //         enemy.setActive(true);
-    //         enemy.setVisible(true);
-
-    //         // You can also set an initial velocity if needed
-    //     }
-    // }
-
-
-// console.log(this.enemies.getChildren());
-// this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
 this.input.on('pointerdown', pointer => {
     this.shoot.play();
     const activePointer = this.input.activePointer;
@@ -137,7 +114,9 @@ this.input.on('pointerdown', pointer => {
     if (bullet) {
         bullet.setActive(true);
         bullet.setVisible(true);
-        
+        bullet.setInteractive();
+        bullet.enableBody = true;
+        bullet.onOverlap = true;
         // Calculate shooting vector and set bullet speed
         let vector = new Phaser.Math.Vector2(lockedToCamPointer.x - this.hero.x, lockedToCamPointer.y - this.hero.y);
         vector.setLength(bullet.shootspeed);
@@ -154,34 +133,24 @@ this.physics.add.collider(this.bullets, collisionGroup, (bullet, collisionObject
     bullet.destroy(); // Remove bullet on collision
 });
 
-//test
 
-
-
-
-
-// function increaseSpeed(){
-// if (yes == true && enemySpeed <= 500){
-
-// setTimeout(() => {
-// enemySpeed += 20;
-// console.log("speed increased" + enemySpeed);
-// increaseSpeed()
-// }, 3000);
-// }
 //chickens
 this.chickens = this.physics.add.group({
     maxSize: 10,
     collideWorldBounds: true,
-    maxSpeed: 20
+    maxSpeed: 20,
+    health: 1
 })
 for (var i = 0; i < 10; i++) {
 
 let ranchiX = Phaser.Math.Between(50, 1500);
 let ranchiY = Phaser.Math.Between(50, 1500);
 const chicken = this.physics.add.sprite(ranchiX, ranchiY, 'chicken');
+    chicken.enableBody = true;
+    chicken.body.onCollide = true;
     chicken.setCollideWorldBounds(true);
     chicken.setBounce(1); // Optional: makes it bounce off walls
+
 
     // Set up the random movement timer
     this.time.addEvent({
@@ -199,7 +168,7 @@ const chicken = this.physics.add.sprite(ranchiX, ranchiY, 'chicken');
             ];
             
             const move = Phaser.Math.RND.pick(directions);
-            chicken.setVelocity(move.x, move.y);
+            if (chicken.active) {chicken.setVelocity(move.x, move.y);
             if (move.type === 'peck'){
                 this.peck.play();
             }
@@ -207,35 +176,26 @@ const chicken = this.physics.add.sprite(ranchiX, ranchiY, 'chicken');
             if (move.x > 0) chicken.setFlipX(true);
             else if (move.x < 0) chicken.setFlipX(false);
         }
+        }
     });
-
+this.physics.add.overlap(chicken, this.bullets, handleBulletAndChickenCollision, undefined, this); 
+this.physics.add.collider(chicken, collisionGroup); 
+function handleBulletAndChickenCollision(chicken, bullet){
+    console.log("test");
+    chicken.destroy();
+   let pickupChicken = this.physics.add.sprite(chicken.x, chicken.y, 'chicken');
+   pickupChicken.setFlipY(true);
+   this.pickupChickens.add(pickupChicken);
+   console.log(this.pickupChickens.children);
 
 }
 
-
-
-//     this.chickens.getChildren().forEach(chicken => {
-// this.time.addEvent({
-//     delay: 2000, // Change direction every 2 seconds
-//     callback: () => {
-//         const speed = 100;
-//         const directions = [
-//             { x: speed, y: 0 },  // Right
-//             { x: -speed, y: 0 }, // Left
-//             { x: 0, y: speed },  // Down
-//             { x: 0, y: -speed }  // Up
-//         ];
-//         const randomDir = Phaser.Math.RND.pick(directions);
-//         this.chickens.setVelocity(randomDir.x, randomDir.y);
-//     },
-//     loop: true
-// });
-    // });
-// Inside create()
+}
+// Add overlap detection for bullets and chickens
 
 
 
-// increaseSpeed();
+
 }
 
 // move speed and movement controls
@@ -245,29 +205,10 @@ const chicken = this.physics.add.sprite(ranchiX, ranchiY, 'chicken');
 
 
 update(time, delta) {
+
+
 const heroX = this.hero.x;
     const heroY = this.hero.y;
-
-    // this.enemies.getChildren().forEach(enemy => {
-    //     if (enemy.active) { // Check if the enemy is active
-    //         const enemyX = enemy.x;
-    //         const enemyY = enemy.y;
-    //         const directionX = heroX - enemyX;
-    //         const directionY = heroY - enemyY;
-    //         const distance = Math.sqrt(directionX * directionX + directionY * directionY);
-
-    //         if (distance > 0) {
-    //             const speed = enemySpeed || 100;
-    //             enemy.setVelocity(
-    //                 (directionX / distance) * speed,
-    //                 (directionY / distance) * speed
-    //             );
-    //         } else {
-    //             enemy.setVelocity(0, 0);
-    //         }
-    //     }
-    // });
-  // Runs once per frame for the duration of the scene
 
 
 // movement
@@ -325,30 +266,8 @@ setTimeout(() => {
 }, 1000);
 }
 
-//enemy
-//   const tx = this.hero.x;
-//   const ty = this.hero.y;
-
-//   const ex = this.enemy.x;
-//   const ey = this.enemy.y;
-
-//   this.physics.moveToObject(this.enemy, this.hero, enemySpeed);
-
-  
-//   const rotation = Phaser.Math.Angle.Between(ex, ey, tx, ty)
-
-// if (yes == true){
-// yes = false;
-
-//   setTimeout(() => {
-//   console.log("Delayed for 1 second.");
-// this.enemy = this.physics.add.existing(new Enemy(this, eSpawnX, eSpawnY));
-//   this.physics.moveToObject(this.enemy, this.hero, enemySpeed);
-
-// }, 5000);
-// }
 if (this.SpaceKey.isDown){
-    console.log(this.chickens.getChildren());
+    console.log(this.pickupChickens);
 }
 
     
