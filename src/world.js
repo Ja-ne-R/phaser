@@ -8,6 +8,7 @@ export class World extends Phaser.Scene {
     constructor() {
         super('World');
         this.pickupChickens = null;
+        this.chickenCount = 0;
     }
 
 
@@ -27,6 +28,7 @@ var cooldown = false;
 
 
 create() {
+    this.chickenCount = 0;
 
   this.pickupChickens = this.add.group();
 
@@ -181,6 +183,7 @@ const chicken = this.physics.add.sprite(ranchiX, ranchiY, 'chicken');
 this.physics.add.overlap(chicken, this.bullets, handleBulletAndChickenCollision, undefined, this); 
 this.physics.add.collider(chicken, collisionGroup); 
 function handleBulletAndChickenCollision(chicken, bullet){
+    this.chickenCount += 1;
     console.log("test");
     chicken.destroy();
    let pickupChicken = this.physics.add.sprite(chicken.x, chicken.y, 'chicken');
@@ -188,6 +191,17 @@ function handleBulletAndChickenCollision(chicken, bullet){
    this.pickupChickens.add(pickupChicken);
    console.log(this.pickupChickens.children);
 
+    // this.tweens.add({
+    //     targets: pickupChicken,
+    //     x: this.hero.x,
+    //     y: this.hero.y,
+    //     duration: 1000,
+    //     ease: 'Power2',
+    //     onComplete: () => {
+    //         console.log(pickupChicken);
+    //         pickupChicken.destroy();
+    //     }
+    // });
 }
 
 }
@@ -206,6 +220,30 @@ function handleBulletAndChickenCollision(chicken, bullet){
 
 update(time, delta) {
 
+
+this.pickupChickens.children.each((pickupChicken) => {
+        let directionX = this.hero.x - pickupChicken.x;
+        let directionY = this.hero.y - pickupChicken.y;
+        let length = Math.sqrt(directionX * directionX + directionY * directionY);
+
+        if (length > 0) {
+            directionX /= length;
+            directionY /= length;
+
+            // Move pickupChicken towards the hero
+            let speed = 100; // Adjust speed as necessary
+            pickupChicken.setVelocity(directionX * speed, directionY * speed);
+        }
+        this.physics.add.overlap (pickupChicken, this.hero, (hero, collisionObject) => {
+    console.log("yes");
+    pickupChicken.destroy();
+    this.chickenCount += 1;
+
+    console.log(this.chickenCount);
+
+});
+
+    });
 
 const heroX = this.hero.x;
     const heroY = this.hero.y;

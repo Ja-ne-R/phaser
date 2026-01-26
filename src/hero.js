@@ -9,7 +9,7 @@ class Hero extends Phaser.Physics.Arcade.Image {
         this.scene = scene;
         this.health = 1;
         this.speed = 200;
-
+        this.chickenCount = 0;
     }
 
     preload ()

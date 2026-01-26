@@ -1,7 +1,6 @@
-// "Every great game begins with a single scene. Let's make this one unforgettable!"
 import Bullet from "/src/bullet.js"
 import Hero from "/src/hero.js"
-
+import World from "/src/world.js"
 
 export class Castle extends Phaser.Scene {
     constructor ()
@@ -23,6 +22,10 @@ this.SprintKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT
     }
 
     create() {
+        let chickenText = this.add.text(100, 600, 'Chickens: ' + World.chickenCount)
+
+            .setDepth(100);
+            chickenText.setScrollFactor(0);
 this.dungeon_music = this.sound.add('dungeon_music');
 this.dungeon_music.loop = true;
 this.dungeon_music.play();
