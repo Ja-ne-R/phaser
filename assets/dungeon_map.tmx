@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="17">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="24">
  <editorsettings>
   <export target="dungeon_map.json" format="json"/>
  </editorsettings>
@@ -227,5 +227,11 @@
  </objectgroup>
  <objectgroup id="4" name="Entrance">
   <object id="11" x="32.2727" y="47.8182" width="15.3636" height="16.1818"/>
+ </objectgroup>
+ <objectgroup id="6" name="Chicken">
+  <object id="20" x="-2" y="558.667" width="647.333" height="17"/>
+  <object id="21" x="624.667" y="561.667" width="41" height="407"/>
+  <object id="22" x="-8.33333" y="945.333" width="649.333" height="34.6667"/>
+  <object id="23" x="-5.66667" y="557" width="37" height="413"/>
  </objectgroup>
 </map>

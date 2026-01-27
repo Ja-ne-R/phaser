@@ -28,19 +28,23 @@ var cooldown = false;
 
 
 create() {
-    this.chickenCount = 0;
+this.dungeon_music = this.sound.add('dungeon_music');
 
   this.pickupChickens = this.add.group();
 
 this.camera = this.cameras.main;
+this.piano = this.sound.add('piano');
+this.piano.loop = true;
+this.piano.volume = 0.3;
+this.piano.play();
 var map = this.make.tilemap({ key: 'map'});
 var tiles = map.addTilesetImage('tileset', 'tiles');
 var layer = map.createLayer("Ground", tiles, 0, 0);
-var fillerLayer = map.createLayer('Filler', tiles, 0, 0);
-var treeLayer = map.createLayer('Trees', tiles, 0, 0);
+// var fillerLayer = map.createLayer('Filler', tiles, 0, 0);
+// var treeLayer = map.createLayer('Trees', tiles, 0, 0);
 var stuffLayer = map.createLayer('Stuff', tiles, 0, 0);
 var castleEntranceLayer = map.getObjectLayer('CastleEntrance');
-this.hero = this.physics.add.existing(new Hero(this, 100, 100));
+this.hero = this.physics.add.existing(new Hero(this, 200, 200));
 this.wand = this.add.image(this.hero.x, this.hero.y, 'wand');
 
 this.cameras.main.startFollow(this.hero, true, 1, 1);
@@ -92,9 +96,11 @@ collisionGroup.add(gameObject);
         this.physics.add.overlap(this.hero, gameObject, (hero, collisionObject) => {
     console.log("hello");
     this.scene.switch('Castle');
+
+    this.data.set('chickenCount', this.chickenCount);
     console.log(this.hero.x);
     console.log(this.hero.y);
-    this.hero.setY(1400);
+    this.hero.setY(500);
 });
     }
 
@@ -180,46 +186,36 @@ const chicken = this.physics.add.sprite(ranchiX, ranchiY, 'chicken');
         }
         }
     });
+
 this.physics.add.overlap(chicken, this.bullets, handleBulletAndChickenCollision, undefined, this); 
 this.physics.add.collider(chicken, collisionGroup); 
 function handleBulletAndChickenCollision(chicken, bullet){
-    this.chickenCount += 1;
-    console.log("test");
+
+
     chicken.destroy();
    let pickupChicken = this.physics.add.sprite(chicken.x, chicken.y, 'chicken');
    pickupChicken.setFlipY(true);
    this.pickupChickens.add(pickupChicken);
    console.log(this.pickupChickens.children);
 
-    // this.tweens.add({
-    //     targets: pickupChicken,
-    //     x: this.hero.x,
-    //     y: this.hero.y,
-    //     duration: 1000,
-    //     ease: 'Power2',
-    //     onComplete: () => {
-    //         console.log(pickupChicken);
-    //         pickupChicken.destroy();
-    //     }
-    // });
+
 }
 
 }
-// Add overlap detection for bullets and chickens
 
 
 
 
 }
 
-// move speed and movement controls
+
 
 
 
 
 
 update(time, delta) {
-
+this.dungeon_music.stop();
 
 this.pickupChickens.children.each((pickupChicken) => {
         let directionX = this.hero.x - pickupChicken.x;

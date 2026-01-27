@@ -6,6 +6,7 @@ export class Castle extends Phaser.Scene {
     constructor ()
     {
         super({ key: 'Castle' });
+        this.chicks;
     }
 
     init() {
@@ -22,7 +23,9 @@ this.SprintKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT
     }
 
     create() {
-        let chickenText = this.add.text(100, 600, 'Chickens: ' + World.chickenCount)
+        // let chicks = this.scene.get('World').data.get('chickenCount');
+// console.log(chicks);
+        let chickenText = this.add.text(100, 600, 'Chickens: ' + 0)
 
             .setDepth(100);
             chickenText.setScrollFactor(0);
@@ -37,6 +40,7 @@ var voidLayer = dungeonmap.createLayer("DungeonVoid", dungeontiles, 0, 0);
 var layer = dungeonmap.createLayer("Dungeon", dungeontiles, 0, 0);
 var stuffLayer = dungeonmap.createLayer('DungeonStuff', dungeontiles, 0, 0);
 this.camera = this.cameras.main;
+
 this.hero = this.physics.add.existing(new Hero(this, 100, 100));
 this.wand = this.add.image(this.hero.x, this.hero.y, 'wand');
 this.cameras.main.startFollow(this.hero, true, 1, 1);
@@ -60,6 +64,7 @@ collisionGroup.add(gameObject);
         
         this.physics.add.collider( this.hero, gameObject );
     }
+    
 for( let obj of entranceLayer.objects ){
         
         // since you are not displaying the object the shape doesn't matter, only the collision body
@@ -78,15 +83,21 @@ collisionGroup.add(gameObject);
         
         this.physics.add.overlap(this.hero, gameObject, (hero, collisionObject) => {
     console.log("hello");
+    this.dungeon_music.stop();    
     this.scene.switch('World');
     this.hero.setX(100);
     this.hero.setY(100);
-    this.dungeon_music.stop();
+
 });
     }
 
     }
     update(){
+                let chicks = this.scene.get('World').data.get('chickenCount');
+                let chickenText = this.add.text(100, 600, 'Chickens: ' + chicks)
+
+            .setDepth(100);
+            chickenText.setScrollFactor(0);
             if (this.DKey.isDown) {
         this.hero.setVelocityX(this.hero.speed);
         this.wand.setX(this.hero.x);
