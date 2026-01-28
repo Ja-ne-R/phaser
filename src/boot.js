@@ -23,6 +23,7 @@ export class Boot extends Phaser.Scene {
   this.load.audio('peck', 'assets/peck.mp3');
   this.load.audio('dungeon_music', 'assets/dungeon_music.mp3');
   this.load.audio('piano', 'assets/piano.mp3');
+  this.load.spritesheet('npc', 'assets/NPC_test.png', { frameWidth: 16 , frameHeight: 16 });
     }
 
     create() {

@@ -39,12 +39,37 @@ this.piano.volume = 0.3;
 this.piano.play();
 var map = this.make.tilemap({ key: 'map'});
 var tiles = map.addTilesetImage('tileset', 'tiles');
+var waterLayer = map.createLayer('Water', tiles, 0, 0);
 var layer = map.createLayer("Ground", tiles, 0, 0);
-// var fillerLayer = map.createLayer('Filler', tiles, 0, 0);
-// var treeLayer = map.createLayer('Trees', tiles, 0, 0);
+
+var roadLayer = map.createLayer('Road', tiles, 0, 0);
 var stuffLayer = map.createLayer('Stuff', tiles, 0, 0);
 var castleEntranceLayer = map.getObjectLayer('CastleEntrance');
 this.hero = this.physics.add.existing(new Hero(this, 200, 200));
+
+
+
+
+    this.anims.create({
+        key: 'down',
+        frames: this.anims.generateFrameNumbers('npc', {start: 0, end: 3}),
+        frameRate: 5,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'turn',
+        frames: [{key: 'npc', frame: 4}],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('npc', {start: 4, end: 7}),
+        frameRate: 5,
+        repeat: -1
+    });
+
 this.wand = this.add.image(this.hero.x, this.hero.y, 'wand');
 
 this.cameras.main.startFollow(this.hero, true, 1, 1);
@@ -145,18 +170,16 @@ this.physics.add.collider(this.bullets, collisionGroup, (bullet, collisionObject
 //chickens
 this.chickens = this.physics.add.group({
     maxSize: 10,
-    collideWorldBounds: true,
     maxSpeed: 20,
     health: 1
 })
 for (var i = 0; i < 10; i++) {
 
-let ranchiX = Phaser.Math.Between(50, 1500);
-let ranchiY = Phaser.Math.Between(50, 1500);
+let ranchiX = Phaser.Math.Between(290, 900);
+let ranchiY = Phaser.Math.Between(1200, 1700);
 const chicken = this.physics.add.sprite(ranchiX, ranchiY, 'chicken');
     chicken.enableBody = true;
     chicken.body.onCollide = true;
-    chicken.setCollideWorldBounds(true);
     chicken.setBounce(1); // Optional: makes it bounce off walls
 
 
@@ -250,6 +273,7 @@ const heroX = this.hero.x;
     if (this.DKey.isDown) {
         this.hero.setVelocityX(this.hero.speed);
         this.wand.setX(this.hero.x);
+
     } else if (this.AKey.isDown) {
         this.hero.setVelocityX(-this.hero.speed);
         this.wand.setX(this.hero.x);
@@ -301,7 +325,8 @@ setTimeout(() => {
 }
 
 if (this.SpaceKey.isDown){
-    console.log(this.pickupChickens);
+    console.log(this.hero.x); // 290 and 900
+    console.log(this.hero.y); // 1200 and 900
 }
 
     

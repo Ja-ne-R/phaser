@@ -3,18 +3,33 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "untitled.tmx",
     "expandedProjectPaths": [
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 2
+            "scaleInDock": 1
         },
         "#tileset": {
             "scaleInDock": 2
+        },
+        "NPC_test.tsj": {
+            "scaleInDock": 1
+        },
+        "untitled.tmx": {
+            "scale": 2,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 512.25,
+                "y": 681.25
+            }
+        },
+        "untitled.tmx#tileset": {
+            "scaleInDock": 3
         }
     },
     "last.exportedFilePath": "C:/Users/Jane/Desktop/phaser game/this/assets",
+    "last.externalTilesetPath": "C:/Users/Jane/Desktop/phaser game/this/assets",
     "last.imagePath": "C:/Users/Jane/Desktop/phaser game/this/assets",
     "map.height": 300,
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
@@ -23,9 +38,11 @@
     "map.tileWidth": 16,
     "map.width": 300,
     "openFiles": [
+        "untitled.tmx"
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
+        "untitled.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
